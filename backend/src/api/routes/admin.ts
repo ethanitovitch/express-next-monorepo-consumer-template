@@ -4,29 +4,23 @@ import { adminOnlyRoute } from './utils'
 import {
   getAdminStats,
   getAdminUsers,
-  getAdminOrganizations,
-  addOrganizationCredits,
+  addUserCredits,
 } from '@/api/controllers/admin.controller'
 import { validateAndMerge } from '@/api/middlewares/validationMiddleware'
 import {
-  AddOrganizationCreditsRequestSchema,
-  AddOrganizationCreditsRequest,
+  AddUserCreditsRequestSchema,
+  AddUserCreditsRequest,
 } from '@shared/types/src'
 
 const router = Router()
 
 router.get('/stats', withBetterAuth, adminOnlyRoute<{}>(getAdminStats))
 router.get('/users', withBetterAuth, adminOnlyRoute<{}>(getAdminUsers))
-router.get(
-  '/organizations',
-  withBetterAuth,
-  adminOnlyRoute<{}>(getAdminOrganizations),
-)
 router.post(
-  '/organizations/:organizationId/credits',
+  '/users/:userId/credits',
   withBetterAuth,
-  validateAndMerge(AddOrganizationCreditsRequestSchema),
-  adminOnlyRoute<AddOrganizationCreditsRequest>(addOrganizationCredits),
+  validateAndMerge(AddUserCreditsRequestSchema),
+  adminOnlyRoute<AddUserCreditsRequest>(addUserCredits),
 )
 
 export default router

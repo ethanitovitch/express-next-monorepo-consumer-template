@@ -4,19 +4,14 @@ import AuthCard from "@/components/AuthCard";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSignUpEmail, useSignInSocial } from "@/hooks/api/useAuth";
 
 export default function SignupPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Get invitation ID and email from query params
-  const inviteId = searchParams.get("inviteId");
-  const emailParam = searchParams.get("email");
 
   const [name,setName]=useState("");
-  const [email,setEmail]=useState(emailParam || "");
+  const [email,setEmail]=useState("");
   const [pw,setPw]=useState("");
   const [confirm,setConfirm]=useState("");
   
@@ -32,18 +27,12 @@ export default function SignupPage() {
       return toast.error("Password must be at least 8 characters.");
     }
     
-    // Build callback URL with invitation params if they exist
-    let callbackURL = `${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/verify`;
-    if (inviteId) {
-      callbackURL += `?inviteId=${inviteId}`;
-    }
-
     signUpMutation.mutate(
       {
         email,
         password: pw,
         name,
-        callbackURL,
+        callbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/verify`,
       },
       {
         onSuccess: (result) => {
@@ -51,12 +40,8 @@ export default function SignupPage() {
             toast.error(result.error.message || "Failed to create account");
           } else {
             localStorage.setItem("pendingVerificationEmail", email);
-            // Store invitation info if it exists
-            if (inviteId) {
-              localStorage.setItem("pendingInvitation", JSON.stringify({ inviteId }));
-            }
             toast.success("Account created! Check your email to verify.");
-            router.push(inviteId ? `/verify?inviteId=${inviteId}` : "/verify");
+            router.push("/verify");
           }
         },
         onError: () => {
@@ -67,16 +52,10 @@ export default function SignupPage() {
   }
 
   async function handleGoogleSignUp() {
-    // Build callback URL with invitation if it exists
-    let callbackURL = `${window.location.origin}/dashboard`;
-    if (inviteId) {
-      callbackURL = `${window.location.origin}/accept-invitation/${inviteId}`;
-    }
-
     socialSignInMutation.mutate(
       {
         provider: "google",
-        callbackURL,
+        callbackURL: `${window.location.origin}/dashboard`,
       },
       {
         onError: () => {
@@ -89,11 +68,6 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen grid place-items-center p-6">
       <AuthCard title="Create your account">
-        {inviteId && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-            Please sign up before accepting the invitation.
-          </div>
-        )}
         <form onSubmit={onSubmit} className="space-y-4">
           <Input label="Name" value={name} onChange={e=>setName(e.target.value)} />
           <Input label="Email" type="email" value={email} onChange={e=>setEmail(e.target.value)} required />
@@ -125,10 +99,7 @@ export default function SignupPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <a 
-              className="text-primary underline" 
-              href={inviteId ? `/login?inviteId=${inviteId}&redirect=${encodeURIComponent(`/accept-invitation/${inviteId}`)}` : "/login"}
-            >
+            <a className="text-primary underline" href="/login">
               Sign in
             </a>
           </p>

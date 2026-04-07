@@ -1,12 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE "public"."User";
-
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -16,9 +7,11 @@ CREATE TABLE "user" (
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "name" TEXT,
     "image" TEXT,
-    "permission" TEXT NOT NULL DEFAULT 'USER',
     "stripeCustomerId" TEXT,
-    "lastActiveOrganizationId" TEXT,
+    "role" TEXT,
+    "banned" BOOLEAN DEFAULT false,
+    "banReason" TEXT,
+    "banExpires" TIMESTAMP(3),
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
@@ -33,7 +26,7 @@ CREATE TABLE "session" (
     "ipAddress" TEXT,
     "userAgent" TEXT,
     "userId" TEXT NOT NULL,
-    "activeOrganizationId" TEXT,
+    "impersonatedBy" TEXT,
 
     CONSTRAINT "session_pkey" PRIMARY KEY ("id")
 );
@@ -70,42 +63,6 @@ CREATE TABLE "verification" (
 );
 
 -- CreateTable
-CREATE TABLE "organization" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "slug" TEXT NOT NULL,
-    "logo" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL,
-    "metadata" TEXT,
-
-    CONSTRAINT "organization_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "member" (
-    "id" TEXT NOT NULL,
-    "organizationId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "role" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "member_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "invitation" (
-    "id" TEXT NOT NULL,
-    "organizationId" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "role" TEXT,
-    "status" TEXT NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL,
-    "inviterId" TEXT NOT NULL,
-
-    CONSTRAINT "invitation_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "subscription" (
     "id" TEXT NOT NULL,
     "plan" TEXT NOT NULL,
@@ -123,14 +80,49 @@ CREATE TABLE "subscription" (
     CONSTRAINT "subscription_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "credit_transaction" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "paymentInvoiceId" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "type" TEXT NOT NULL,
+    "metadata" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "credit_transaction_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "notification" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "link" TEXT,
+    "readAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "notification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "example" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "example_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "session_token_key" ON "session"("token");
-
--- CreateIndex
-CREATE UNIQUE INDEX "organization_slug_key" ON "organization"("slug");
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -139,13 +131,7 @@ ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "member" ADD CONSTRAINT "member_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "member" ADD CONSTRAINT "member_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviterId_fkey" FOREIGN KEY ("inviterId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "notification" ADD CONSTRAINT "notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

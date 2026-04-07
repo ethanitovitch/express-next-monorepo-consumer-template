@@ -27,6 +27,7 @@ export const env = envSchema.parse({
 export const ENDPOINTS = {
   USER: {
     ACCOUNT: '/user/account',
+    CREDIT_BALANCE: (userId: string) => `/user/${userId}/credit-balance`,
   },
   AUTH: {
     VERIFY_EMAIL: '/auth/verify-email',
@@ -37,15 +38,10 @@ export const ENDPOINTS = {
     SIGN_OUT: '/auth/sign-out',
     CHANGE_PASSWORD: '/auth/change-password',
   },
-  ORGANIZATION: {
-    INVITE_MEMBER: '/auth/organization/invite-member',
-    CREDIT_BALANCE: (orgId: string) => `/organization/${orgId}/credit-balance`,
-  },
   ADMIN: {
     STATS: '/admin/stats',
     USERS: '/admin/users',
-    ORGANIZATIONS: '/admin/organizations',
-    ADD_CREDITS: (organizationId: string) => `/admin/organizations/${organizationId}/credits`,
+    ADD_CREDITS: (userId: string) => `/admin/users/${userId}/credits`,
   },
   NOTIFICATIONS: {
     LIST: '/notifications',
@@ -56,15 +52,11 @@ export const ENDPOINTS = {
 };
 
 export const QUERY_KEYS = {
-  organizations: () => ['organizations'] as const,
   userAccount: () => ['user', 'account'] as const,
-  organizationMembers: (orgId?: string) => ['organization', 'members', orgId] as const,
-  organizationInvitations: (orgId?: string) => ['organization', 'invitations', orgId] as const,
-  organizationCreditBalance: (orgId?: string) => ['organization', 'credit-balance', orgId] as const,
+  userCreditBalance: (userId?: string) => ['user', 'credit-balance', userId] as const,
   adminStats: () => ['admin', 'stats'] as const,
   adminUsers: () => ['admin', 'users'] as const,
-  adminOrganizations: () => ['admin', 'organizations'] as const,
-  adminAddCredits: (organizationId?: string) => ['admin', 'organizations', organizationId, 'credits'] as const,
+  adminAddCredits: (userId?: string) => ['admin', 'users', userId, 'credits'] as const,
   notifications: () => ['notifications'] as const,
   notificationsUnreadCount: () => ['notifications', 'unread-count'] as const,
 };

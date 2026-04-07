@@ -5,14 +5,14 @@ export const useCreateCheckoutSession = () => {
   return useMutation({
     mutationFn: async ({ 
       planName, 
-      organizationId 
+      userId
     }: { 
       planName: string; 
-      organizationId: string;
+      userId: string;
     }) => {
       return await subscription.upgrade({
         plan: planName,
-        referenceId: organizationId,
+        referenceId: userId,
         successUrl: `${window.location.origin}/dashboard/settings?success=true`,
         cancelUrl: `${window.location.origin}/dashboard/settings?canceled=true`
       });
@@ -20,27 +20,27 @@ export const useCreateCheckoutSession = () => {
   });
 };
 
-export const useOrganizationSubscription = (organizationId?: string) => {
+export const useUserSubscription = (userId?: string) => {
   return useQuery({
-    queryKey: ["organization-subscription", organizationId],
+    queryKey: ["user-subscription", userId],
     queryFn: async () => {
-      if (!organizationId) return null;
+      if (!userId) return null;
       const subscriptions = await subscription.list({
         query: {
-          referenceId: organizationId,
+          referenceId: userId,
         },
       });
       return subscriptions.data?.[0] || null;
     },
-    enabled: !!organizationId,
+    enabled: !!userId,
   });
 };
 
 export const useCreatePortalSession = () => {
   return useMutation({
-    mutationFn: async ({ organizationId }: { organizationId: string }) => {
+    mutationFn: async ({ userId }: { userId: string }) => {
       return await subscription.billingPortal({
-        referenceId: organizationId,
+        referenceId: userId,
         returnUrl: `${window.location.origin}/dashboard/settings`,
       });
     },

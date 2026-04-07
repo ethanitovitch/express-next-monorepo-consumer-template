@@ -12,7 +12,7 @@ export const getSubscriptionFromStripeSubscriptionId = async (
 }
 
 export const createCreditTransaction = async (
-  organizationId: string,
+  userId: string,
   paymentInvoiceId: string,
   amount: number,
   metadata: any,
@@ -21,7 +21,7 @@ export const createCreditTransaction = async (
     .insertInto('credit_transaction')
     .values(
       withIdAndTimestamps({
-        organizationId,
+        userId,
         paymentInvoiceId,
         amount: amount,
         type: 'interview',
@@ -31,10 +31,10 @@ export const createCreditTransaction = async (
     .execute()
 }
 
-export const getOrganizationCreditBalance = async (organizationId: string) => {
+export const getUserCreditBalance = async (userId: string) => {
   const result = await db
     .selectFrom('credit_transaction')
-    .where('organizationId', '=', organizationId)
+    .where('userId', '=', userId)
     .select((eb) => eb.fn.sum<number>('amount').as('balance'))
     .executeTakeFirst()
   return result?.balance ?? 0

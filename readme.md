@@ -50,7 +50,7 @@ Bonus:
 - express backend (with lots of useful features)
 - next js frontend
 - shared folder for types & utilities
-- full authentication with organization and payments through better auth
+- full authentication with user-scoped billing through better auth
 - real time notifications and channels using soketi
 - background jobs with bullmq
 - analytics with posthog, google & vercel
@@ -98,7 +98,7 @@ The backend comes with a lot of features I typically needed to copy paste from o
 - basic authentication
 - error handling
 - authentication
-- organizations
+- user profile + credits
 - payments
 - notifications
 - mcp interface
@@ -109,8 +109,7 @@ Additionally, the backend is setup with a shared types folder so it's easy to se
 - landing page
 - authentication flows
 - dashboard skeleton
-- settings around the main user, orgs and payments
-- ability to create new orgs, invite users with different roles
+- settings around account + payments
 - payments
 - admin dashboard + user impersonation
 - theme builder

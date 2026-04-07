@@ -4,28 +4,16 @@ import AuthCard from "@/components/AuthCard";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVerifyEmail, useSendVerificationEmail } from "@/hooks/api/useAuth";
-import { useSession } from "@/lib/auth-client";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [verified, setVerified] = useState(false);
-  const { data: session } = useSession();
   
   const verifyMutation = useVerifyEmail();
   const resendMutation = useSendVerificationEmail();
 
-  // Get invitation params from URL
-  const inviteId = searchParams.get("inviteId");
   const token = searchParams.get("token");
-
-  // If user is logged in and has invitation params but no token,
-  // they were redirected here after backend verification - send them to accept invitation
-  useEffect(() => {
-    if (session && inviteId && !token) {
-      router.push(`/accept-invitation/${inviteId}`);
-    }
-  }, [session, inviteId, token, router]);
 
   useEffect(() => {
     if (token && !verified && !verifyMutation.isPending) {
@@ -37,24 +25,8 @@ export default function VerifyEmailPage() {
             localStorage.removeItem("pendingVerificationEmail");
             setVerified(true);
             toast.success("Email verified successfully!");
-            
-            // Check for invitation in query params first, then localStorage
-            let targetUrl = "/dashboard";
-            
-            if (inviteId) {
-              targetUrl = `/accept-invitation/${inviteId}`;
-            } else {
-              const pendingInvitation = localStorage.getItem("pendingInvitation");
-              if (pendingInvitation) {
-                const { inviteId: storedInviteId } = JSON.parse(pendingInvitation);
-                if (storedInviteId) {
-                  targetUrl = `/accept-invitation/${storedInviteId}`;
-                }
-              }
-            }
-            
-            localStorage.removeItem("pendingInvitation");
-            setTimeout(() => router.push(targetUrl), 2000);
+
+            setTimeout(() => router.push("/dashboard"), 2000);
           }
         },
         onError: () => {
@@ -74,11 +46,7 @@ export default function VerifyEmailPage() {
       return;
     }
 
-    // Build callback URL with invitation params if they exist
-    let callbackURL = `${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/verify`;
-    if (inviteId) {
-      callbackURL += `?inviteId=${inviteId}`;
-    }
+    const callbackURL = `${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/verify`;
 
     resendMutation.mutate(
       {
@@ -100,20 +68,6 @@ export default function VerifyEmailPage() {
     );
   }
 
-  // If already verified and redirecting to invitation
-  if (session && inviteId && !token) {
-    return (
-      <div className="min-h-screen grid place-items-center p-6">
-        <AuthCard title="Redirecting...">
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)] mx-auto"></div>
-            <p className="text-sm text-muted-foreground mt-4">Redirecting to accept invitation...</p>
-          </div>
-        </AuthCard>
-      </div>
-    );
-  }
-
   if (verifyMutation.isPending) {
     return (
       <div className="min-h-screen grid place-items-center p-6">
@@ -128,17 +82,13 @@ export default function VerifyEmailPage() {
   }
 
   if (verified) {
-    const hasInvitation = inviteId || localStorage.getItem("pendingInvitation");
-    
     return (
       <div className="min-h-screen grid place-items-center p-6">
         <AuthCard title="Email Verified!">
           <div className="text-center py-8">
             <div className="text-green-500 text-5xl mb-4">✓</div>
             <p className="text-sm text-muted-foreground">
-              {hasInvitation 
-                ? "Your email has been verified. Redirecting to accept invitation..." 
-                : "Your email has been verified. Redirecting to dashboard..."}
+              Your email has been verified. Redirecting to dashboard...
             </p>
           </div>
         </AuthCard>

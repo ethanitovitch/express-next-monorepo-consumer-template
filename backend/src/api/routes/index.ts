@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import exampleRoutes from './example'
 import adminRoutes from './admin'
-import organizationRoutes from './organization'
 import userRoutes from './user'
 import notificationRoutes from './notification'
 import pusherRoutes from './pusher'
@@ -14,7 +13,6 @@ router.get('/health', (req, res) => {
 
 router.use('/example', exampleRoutes)
 router.use('/admin', adminRoutes)
-router.use('/organization', organizationRoutes)
 router.use('/user', userRoutes)
 router.use('/notifications', notificationRoutes)
 router.use('/pusher', pusherRoutes)

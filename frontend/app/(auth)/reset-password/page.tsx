@@ -22,9 +22,6 @@ export default function ResetPasswordPage() {
   const forgotPasswordMutation = useForgotPassword();
   const resetPasswordMutation = useResetPassword();
 
-  // Get invitation params from URL
-  const inviteId = searchParams.get("inviteId");
-
   // If token exists, show reset form, otherwise show request form
   const isResetting = !!token;
 
@@ -32,16 +29,10 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     if (!email) return toast.error("Please enter your email.");
     
-    // Build redirectTo URL with invitation params if they exist
-    let redirectTo = `${window.location.origin}/reset-password`;
-    if (inviteId) {
-      redirectTo += `?inviteId=${inviteId}`;
-    }
-    
     forgotPasswordMutation.mutate(
       {
         email,
-        redirectTo,
+        redirectTo: `${window.location.origin}/reset-password`,
       },
       {
         onSuccess: (result: any) => {
@@ -87,10 +78,8 @@ export default function ResetPasswordPage() {
             toast.error(result.error?.message || "Failed to reset password");
           } else {
             toast.success("Password reset successfully!");
-            
-            // Redirect to invitation if params exist, otherwise to login
-            const targetUrl = inviteId ? `/accept-invitation/${inviteId}` : "/login";
-            setTimeout(() => router.push(targetUrl), 2000);
+
+            setTimeout(() => router.push("/login"), 2000);
           }
         },
         onError: () => {
@@ -128,14 +117,7 @@ export default function ResetPasswordPage() {
             </div>
             
             <div className="pt-4">
-              <Button 
-                onClick={() => router.push(
-                  inviteId 
-                    ? `/login?inviteId=${inviteId}&redirect=${encodeURIComponent(`/accept-invitation/${inviteId}`)}` 
-                    : "/login"
-                )} 
-                className="w-full"
-              >
+              <Button onClick={() => router.push("/login")} className="w-full">
                 Back to Login
               </Button>
             </div>
@@ -174,9 +156,7 @@ export default function ResetPasswordPage() {
               Remember your password?{" "}
               <a 
                 className="text-[var(--color-primary)] underline" 
-                href={inviteId 
-                  ? `/login?inviteId=${inviteId}&redirect=${encodeURIComponent(`/accept-invitation/${inviteId}`)}` 
-                  : "/login"}
+                href="/login"
               >
                 Sign in
               </a>
@@ -211,9 +191,7 @@ export default function ResetPasswordPage() {
             Remember your password?{" "}
             <a 
               className="text-[var(--color-primary)] underline" 
-              href={inviteId 
-                ? `/login?inviteId=${inviteId}&redirect=${encodeURIComponent(`/accept-invitation/${inviteId}`)}` 
-                : "/login"}
+              href="/login"
             >
               Sign in
             </a>

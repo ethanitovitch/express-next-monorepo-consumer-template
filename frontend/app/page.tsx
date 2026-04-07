@@ -127,8 +127,8 @@ const features = [
   },
   {
     icon: Users,
-    title: "Organizations",
-    description: "Multi-tenant architecture. Invite members, manage roles, handle permissions.",
+    title: "Consumer Accounts",
+    description: "Single-user account model out of the box. Profile, billing, and credits included.",
     gradient: "from-chart-2 to-chart-5"
   },
   {
@@ -152,7 +152,7 @@ const features = [
   {
     icon: Lock,
     title: "Admin Dashboard",
-    description: "Pre-built admin panel. User management, organization oversight, role controls.",
+    description: "Pre-built admin panel for user management, impersonation, and credit controls.",
     gradient: "from-chart-2 to-chart-2"
   }
 ];
@@ -228,7 +228,7 @@ export default function Home() {
               </h1>
             
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-              Stop rebuilding auth, organizations, and dashboards. 
+              Stop rebuilding auth, billing, and dashboards. 
               Start with a production-ready foundation that scales.
             </p>
             
@@ -292,7 +292,7 @@ export default function Home() {
                     <span className="text-primary">batteries included</span>
                   </h2>
                   <p className="text-lg text-muted-foreground leading-relaxed">
-                    Authentication, organizations, admin panels, theme customization —
+                    Authentication, consumer accounts, admin panels, theme customization —
                     everything you need to launch your SaaS, internal tool, or side project.
                   </p>
                 </div>
@@ -349,13 +349,13 @@ export default function Home() {
                       <div className="p-2 rounded-lg bg-accent/20">
                         <Users className="w-5 h-5 text-accent-foreground" />
                       </div>
-                      <h3 className="font-bold text-lg">Organizations</h3>
+                      <h3 className="font-bold text-lg">Consumer Accounts</h3>
                     </div>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Multi-tenant system with invitations, roles, and member management.
+                      Personal account model with profiles, billing, and role-aware access.
                     </p>
                     <div className="flex gap-2">
-                      <span className="px-2 py-1 text-xs rounded bg-primary/20 text-primary">Invites</span>
+                      <span className="px-2 py-1 text-xs rounded bg-primary/20 text-primary">Profiles</span>
                       <span className="px-2 py-1 text-xs rounded bg-accent/20 text-accent-foreground">Roles</span>
                     </div>
                   </Card>
@@ -498,7 +498,7 @@ export default function Home() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <span className="px-2 py-1 text-xs rounded bg-background/50">AuthService</span>
-                    <span className="px-2 py-1 text-xs rounded bg-background/50">OrgService</span>
+                      <span className="px-2 py-1 text-xs rounded bg-background/50">UserService</span>
                     <span className="px-2 py-1 text-xs rounded bg-background/50">PaymentService</span>
                   </div>
                 </div>

@@ -22,7 +22,7 @@ export type Account = {
 }
 export type CreditTransaction = {
   id: string
-  organizationId: string
+  userId: string
   paymentInvoiceId: string
   amount: number
   type: string
@@ -36,23 +36,6 @@ export type Example = {
   createdAt: Generated<Timestamp>
   updatedAt: Timestamp
 }
-export type Invitation = {
-  id: string
-  organizationId: string
-  email: string
-  role: string | null
-  status: string
-  expiresAt: Timestamp
-  createdAt: Timestamp
-  inviterId: string
-}
-export type Member = {
-  id: string
-  organizationId: string
-  userId: string
-  role: string
-  createdAt: Timestamp
-}
 export type Notification = {
   id: string
   userId: string
@@ -63,14 +46,6 @@ export type Notification = {
   createdAt: Generated<Timestamp>
   updatedAt: Generated<Timestamp>
 }
-export type Organization = {
-  id: string
-  name: string
-  slug: string
-  logo: string | null
-  createdAt: Timestamp
-  metadata: string | null
-}
 export type Session = {
   id: string
   expiresAt: Timestamp
@@ -80,7 +55,6 @@ export type Session = {
   ipAddress: string | null
   userAgent: string | null
   userId: string
-  activeOrganizationId: string | null
   impersonatedBy: string | null
 }
 export type Subscription = {
@@ -106,7 +80,6 @@ export type User = {
   name: string | null
   image: string | null
   stripeCustomerId: string | null
-  lastActiveOrganizationId: string | null
   role: string | null
   banned: Generated<boolean | null>
   banReason: string | null
@@ -124,10 +97,7 @@ export type DB = {
   account: Account
   credit_transaction: CreditTransaction
   example: Example
-  invitation: Invitation
-  member: Member
   notification: Notification
-  organization: Organization
   session: Session
   subscription: Subscription
   user: User

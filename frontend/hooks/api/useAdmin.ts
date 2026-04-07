@@ -4,7 +4,6 @@ import { admin } from "@/lib/auth-client";
 import type {
   AdminStats,
   AdminUsersResponse,
-  AdminOrganizationsResponse,
 } from "@shared/types/src";
 import { QUERY_KEYS, ENDPOINTS } from "@/lib/config";
 
@@ -27,20 +26,6 @@ export function useAdminUsers(params: { page?: number; limit?: number; search?: 
       searchParams.set("limit", String(limit));
       if (search) searchParams.set("search", search);
       return get<AdminUsersResponse>(`${ENDPOINTS.ADMIN.USERS}?${searchParams.toString()}`);
-    },
-  });
-}
-
-export function useAdminOrganizations(params: { page?: number; limit?: number; search?: string } = {}) {
-  const { page = 1, limit = 20, search } = params;
-  return useQuery({
-    queryKey: ["admin", "organizations", { page, limit, search }],
-    queryFn: async () => {
-      const searchParams = new URLSearchParams();
-      searchParams.set("page", String(page));
-      searchParams.set("limit", String(limit));
-      if (search) searchParams.set("search", search);
-      return get<AdminOrganizationsResponse>(`${ENDPOINTS.ADMIN.ORGANIZATIONS}?${searchParams.toString()}`);
     },
   });
 }
@@ -69,17 +54,17 @@ export function useStopImpersonation() {
   });
 }
 
-export function useAddOrganizationCredits() {
+export function useAddUserCredits() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (params: { organizationId: string; amount: number; reason?: string }) => {
+    mutationFn: async (params: { userId: string; amount: number; reason?: string }) => {
       return post<{ success: boolean; newBalance: number }>(
-        ENDPOINTS.ADMIN.ADD_CREDITS(params.organizationId),
+        ENDPOINTS.ADMIN.ADD_CREDITS(params.userId),
         { amount: params.amount, reason: params.reason }
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "organizations"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
   });
 }

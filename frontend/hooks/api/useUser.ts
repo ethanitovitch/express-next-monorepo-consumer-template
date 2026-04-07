@@ -16,6 +16,19 @@ export function useUserAccount() {
   });
 }
 
+export function useUserCreditBalance(userId?: string) {
+  return useQuery<number>({
+    queryKey: QUERY_KEYS.userCreditBalance(userId),
+    queryFn: async () => {
+      const result = await get<{ balance: number }>(
+        ENDPOINTS.USER.CREDIT_BALANCE(userId!),
+      );
+      return result.balance;
+    },
+    enabled: !!userId,
+  });
+}
+
 /**
  * Helper hook to check if user has password authentication
  * Returns true if user signed up with email/password

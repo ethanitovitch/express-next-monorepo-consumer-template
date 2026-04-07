@@ -4,21 +4,16 @@ import AuthCard from "@/components/AuthCard";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSignInEmail, useSignInSocial } from "@/hooks/api/useAuth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   
   const signInMutation = useSignInEmail();
   const socialSignInMutation = useSignInSocial();
-
-  // Get invitation ID and redirect URL from query params
-  const inviteId = searchParams.get("inviteId");
-  const redirectUrl = searchParams.get("redirect");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,12 +27,7 @@ export default function LoginPage() {
             toast.error(result.error.message || "Failed to sign in");
           } else {
             toast.success("Signed in successfully!");
-            // Redirect to invitation page if invite token exists, otherwise dashboard
-            if (redirectUrl) {
-              router.push(redirectUrl);
-            } else {
-              router.push("/dashboard");
-            }
+            router.push("/dashboard");
           }
         },
         onError: () => {
@@ -48,16 +38,10 @@ export default function LoginPage() {
   }
 
   async function handleGoogleSignIn() {
-    // Build callback URL with redirect param if it exists
-    let callbackURL = `${window.location.origin}/dashboard`;
-    if (redirectUrl) {
-      callbackURL = `${window.location.origin}${redirectUrl}`;
-    }
-
     socialSignInMutation.mutate(
       {
         provider: "google",
-        callbackURL,
+        callbackURL: `${window.location.origin}/dashboard`,
       },
       {
         onError: () => {
@@ -70,11 +54,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen grid place-items-center p-6">
       <AuthCard title="Welcome back">
-        {inviteId && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-            Please sign in before accepting the invitation.
-          </div>
-        )}
         <form onSubmit={onSubmit} className="space-y-4">
           <Input label="Email" type="email" value={email} onChange={e=>setEmail(e.target.value)} required />
           <div className="space-y-2">
@@ -111,10 +90,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             New here?{" "}
-            <a 
-              className="text-primary underline" 
-              href={inviteId ? `/signup?inviteId=${inviteId}&redirect=${encodeURIComponent(redirectUrl || "")}` : "/signup"}
-            >
+            <a className="text-primary underline" href="/signup">
               Create an account
             </a>
           </p>
