@@ -116,9 +116,10 @@ export const getAdminUsers: AuthRequestHandler<{}> = async (req, res) => {
   res.json(response)
 }
 
-export const addUserCredits: AuthRequestHandler<
-  AddUserCreditsRequest
-> = async (req, res) => {
+export const addUserCredits: AuthRequestHandler<AddUserCreditsRequest> = async (
+  req,
+  res,
+) => {
   const { userId, amount, reason } = req.validated
 
   await db
